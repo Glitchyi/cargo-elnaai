@@ -1,0 +1,41 @@
+import React, { useState } from 'react'
+
+
+const title =(
+    <h2>Search Your One from Thousands of Products</h2>
+)
+const desc = "We have large colletions of DataSets"
+const bannerList = [
+    {
+    iconName: "icofont-users-alt-4",
+    text: "1.5 Million Customers",
+    },
+    {
+    iconName: "icofont-notification",
+    text: "More then 2000 Marchent",
+    },
+    {
+    iconName: "icofont-globe",
+    text: "Buy Anything Online",
+    },
+    ];
+const Banner = () => {
+    const [searchInput, setSearchInput] = useState("");
+    const [filteredproducts, setfilteredProducts] = useState("");
+    
+  return (
+    <div className='banner-section style-4'> 
+    <div className="container">
+        <div className="banner-content">
+            {title}
+            <form >
+                <input type="text" name='search' id='search' placeholder='Search Your Need' />
+            </form>
+        </div>
+    </div>
+      
+    </div>
+  )
+}
+
+export default Banner
