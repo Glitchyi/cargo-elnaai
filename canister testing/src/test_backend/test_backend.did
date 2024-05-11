@@ -1,0 +1,14 @@
+// Define the service with methods corresponding to the Rust implementation
+service : {
+  // Corresponds to the greet function
+  greet: (text) -> (text) query;
+
+  // Corresponds to the store_image function
+  store_image: (text, text) -> (text) query;
+  
+  // Corresponds to the add_class_to_dataset function
+  add_class_to_dataset: (text) -> () query;
+
+  // Corresponds to the get_images  _from_dataset function
+  print_all_dataset: () -> (text) query;
+}
