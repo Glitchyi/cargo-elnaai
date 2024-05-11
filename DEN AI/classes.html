@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data base</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 h-screen flex justify-center items-center">
+    <div class="w-100 max-w-md p-8 bg-white rounded-md shadow-md">
+        <h2 class="text-xl font-semibold mb-4"><b>Data Base</b></h2>
+        
+        <div id="inputFields">
+            <div class="flex items-center mb-4">
+                <input type="text" class="w-full py-2 px-3 border rounded-md focus:outline-none focus:ring focus:border-blue-300" placeholder="Place Holder">
+                <button onclick="addInputField()" class="ml-2 py-2 px-4 bg-blue-500 text-white rounded-md">+</button>
+            </div>
+        </div>
+
+        <button onclick="validateAndProceed()" class="w-full py-2 px-4 bg-green-500 text-white rounded-md">Proceed</button>
+        
+        <div id="error" class="text-red-500 mt-2 hidden">There is nothing entered.</div>
+    </div>
+
+    <div id="nftSelection" class="hidden w-100 max-w-md p-8 bg-white rounded-md shadow-md mt-4">
+        <h2 class="text-xl font-semibold mb-4">Select which all classes should be converted to NFT?</h2>
+
+        <div id="inputCheckboxes"></div>
+
+        <div class="mt-4">
+            <input type="checkbox" id="termsCheckbox" onchange="toggleSubmitButton()">
+            <label for="termsCheckbox">I agree to the terms and conditions</label>
+        </div>
+
+        <div id="termsError" class="text-red-500 mt-2 hidden">Please accept terms and conditions first.</div>
+
+        <button id="submitButton" onclick="submitForm()" class="w-full py-2 px-4 bg-blue-500 text-white rounded-md mt-4" disabled>Submit</button>
+    </div>
+
+    <script>
+        function addInputField() {
+            const inputFieldsDiv = document.getElementById('inputFields');
+            const newInputField = document.createElement('div');
+            newInputField.classList.add('flex', 'items-center', 'mb-4');
+            newInputField.innerHTML = `
+                <input type="text" class="w-full py-2 px-3 border rounded-md focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter something">
+                <button onclick="removeInputField(this)" class="ml-2 py-2 px-4 bg-red-500 text-white rounded-md">-</button>
+            `;
+            inputFieldsDiv.appendChild(newInputField);
+        }
+
+        function removeInputField(button) {
+            const inputFieldToRemove = button.parentNode;
+            inputFieldToRemove.remove();
+        }
+
+        function validateAndProceed() {
+            const inputFields = document.querySelectorAll('#inputFields input[type="text"]');
+            let isEmpty = false;
+
+            inputFields.forEach(inputField => {
+                if (inputField.value.trim() === '') {
+                    isEmpty = true;
+                }
+            });
+
+            const errorDiv = document.getElementById('error');
+
+            if (isEmpty) {
+                errorDiv.classList.remove('hidden');
+            } else {
+                errorDiv.classList.add('hidden');
+                document.getElementById('nftSelection').classList.remove('hidden');
+                populateCheckboxList(inputFields);
+            }
+        }
+
+        function populateCheckboxList(inputFields) {
+            const inputCheckboxesDiv = document.getElementById('inputCheckboxes');
+            inputCheckboxesDiv.innerHTML = '';
+
+            inputFields.forEach((inputField, index) => {
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.classList.add('flex', 'items-center');
+
+                const checkboxId = `checkbox${index}`;
+                const checkboxLabel = inputField.value.trim() !== '' ? inputField.value : `Input ${index + 1}`;
+
+                checkboxDiv.innerHTML = `
+                    <input type="checkbox" id="${checkboxId}" class="mr-2" checked>
+                    <label for="${checkboxId}">${checkboxLabel}</label>
+                `;
+
+                inputCheckboxesDiv.appendChild(checkboxDiv);
+            });
+        }
+
+        function toggleSubmitButton() {
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            const submitButton = document.getElementById('submitButton');
+
+            submitButton.disabled = !termsCheckbox.checked;
+        }
+
+        function submitForm() {
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            const termsError = document.getElementById('termsError');
+            const submitButton = document.getElementById('submitButton');
+
+            if (!termsCheckbox.checked) {
+                termsError.classList.remove('hidden');
+                return;
+            }
+
+            // Proceed with form submission...
+            alert('Datasets have been uploded to marketpalce!');
+        }
+    </script>
+</body>
+</html>

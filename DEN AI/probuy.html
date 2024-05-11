@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-xl mx-auto bg-white rounded-md shadow-md p-8 mt-16">
+
+        <h1 class="text-2xl font-bold mb-4">Product Name</h1>
+
+        <div class="mb-4">
+            <img src="https://via.placeholder.com/150" alt="Product Image" class="rounded-md">
+        </div>
+
+        <p class="text-lg mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ullamcorper, tellus nec tincidunt tincidunt, metus lorem dictum lacus.</p>
+
+        <div class="flex items-center mb-4">
+            <span class="text-lg font-semibold mr-4">$99.99</span>
+            <input id="quantity" type="number" class="w-20 py-2 px-3 border rounded-md focus:outline-none focus:ring focus:border-blue-300" value="1" min="1">
+        </div>
+
+        <!-- Payment options -->
+        <div class="mb-4">
+            <label for="paymentOption" class="block text-sm font-medium text-gray-700 mb-1">Select Payment Option</label>
+            <select id="paymentOption" class="w-full py-2 px-3 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                <option value="btc">Bitcoin (BTC)</option>
+                <option value="eth">Ethereum (ETH)</option>
+                <option value="bnb">Binance Coin (BNB)</option>
+                <!-- Add more options for other cryptocurrencies if needed -->
+            </select>
+        </div>
+
+        <button onclick="buyNow()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">Buy Now</button>
+
+        <div class="mt-4">
+            <a href="#" class="text-blue-500 hover:underline">Return to Store</a>
+        </div>
+
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 hidden">
+        <div class="bg-white p-8 rounded-md shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Payment Details</h2>
+            <!-- Payment details will be shown here -->
+            <button onclick="closePaymentModal()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function buyNow() {
+            const quantity = document.getElementById('quantity').value;
+            const paymentOption = document.getElementById('paymentOption').value;
+
+            // Simulate payment processing
+            setTimeout(() => {
+                displayPaymentModal(paymentOption, quantity);
+            }, 2000); // Simulate a delay of 2 seconds (2000 milliseconds)
+        }
+
+        function displayPaymentModal(paymentOption, quantity) {
+            const paymentModal = document.getElementById('paymentModal');
+            paymentModal.classList.remove('hidden');
+            // Display payment details in the modal (for demonstration purposes)
+            const paymentDetails = `You have purchased ${quantity} product(s) using ${paymentOption.toUpperCase()}`;
+            paymentModal.querySelector('h2').textContent = paymentDetails;
+        }
+
+        function closePaymentModal() {
+            const paymentModal = document.getElementById('paymentModal');
+            paymentModal.classList.add('hidden');
+        }
+    </script>
+
+</body>
+</html>

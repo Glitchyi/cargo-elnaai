@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Database</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .left-pane {
+            width: calc(50% - 16px);
+        }
+
+        .btn-cyber {
+            background-color: #00ff00;
+            border-color: #00ff00;
+            box-shadow: 0 0 20px #00ff00;
+        }
+
+        .btn-cyber:hover {
+            background-color: #00cc00;
+            border-color: #00cc00;
+            box-shadow: 0 0 20px #00cc00;
+        }
+
+        .cyber-text {
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .cyber-border {
+            border-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        /* Remove underline from anchor tags */
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 h-screen flex justify-center items-center">
+    <!-- Left Pane - Image Upload -->
+    <div class="left-pane">
+        <div class="w-3/4 lg:w-1/2 p-8 rounded-md shadow-md text-center bg-gray-800 text-white">
+            <img src="up icon.png" alt="Upload Icon" class="mx-auto mb-4 w-20 h-20">
+            <h2 class="text-lg font-semibold mb-4">Upload Image</h2>
+            <input type="file" id="fileInput" class="mb-4">
+            <button onclick="uploadImage()"
+                class="btn-cyber hover:bg-green-700 text-white py-2 px-4 rounded-md">Upload</button>
+            <div id="uploadStatus" class="mt-4 text-gray-300"></div>
+        </div>
+    </div>
+    <button class="absolute bottom-10 right-10 w-20 h-20 bg-gray-100  rounded-full" onclick="connectWallet()"  >
+<img src="https://th.bing.com/th/id/R.9d072d2a80e1adb2f8ed2423819cc2f9?rik=EInruQjGspXyig&riu=http%3a%2f%2fcdn.onlinewebfonts.com%2fsvg%2fimg_475592.png&ehk=LGCAAbXus84iL%2f%2bqk%2bvzJiJ8q0grfZE8UPbVnHnJxQQ%3d&risl=&pid=ImgRaw&r=0" alt="">
+         </button>
+    <!-- Right Pane - Database -->
+    <div class="right-pane flex justify-end w-1/2">
+        <div class="w-100 max-w-md p-8 bg-gray-800 text-white rounded-md shadow-md">
+            <h2 class="text-xl font-semibold mb-4"><b>Data Base</b></h2>
+
+            <div id="inputFields">
+                <div class="flex items-center mb-4">
+                    <input type="text"
+                        class="w-full py-2 px-3 border rounded-md focus:outline-none focus:ring focus:border-blue-300 bg-gray-700 text-white"
+                        placeholder="Place Holder">
+                    <button onclick="addInputField()"
+                        class="ml-2 py-2 px-4 bg-red-500 hover:bg-red-700 text-white rounded-md">+</button>
+                </div>
+            </div>
+
+            <button onclick="validateAndProceed()"
+                class="btn-cyber hover:bg-green-700 text-white py-2 px-4 rounded-md">Proceed</button>
+
+            <div id="error" class="text-red-500 mt-2 hidden">There is nothing entered.</div>
+        </div>
+
+        <div id="nftSelection" class="hidden w-100 max-w-md p-8 bg-gray-800 text-white rounded-md shadow-md mt-4">
+            <h2 class="text-xl font-semibold mb-4">Select which all classes should be converted to NFT?</h2>
+
+            <div id="inputCheckboxes"></div>
+
+            <div class="mt-4">
+                <input type="checkbox" id="termsCheckbox" onchange="toggleSubmitButton()"
+                    class="form-checkbox text-cyber">
+                <label for="termsCheckbox" class="cyber-text">I agree to the terms and conditions</label>
+            </div>
+
+            <div id="termsError" class="text-red-500 mt-2 hidden">Please accept terms and conditions first.</div>
+
+            <button id="submitButton" onclick="submitForm()"
+                class="btn-cyber hover:bg-green-700 text-white py-2 px-4 rounded-md mt-4" disabled>Submit</button>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="absolute top-0 left-0 right-0 py-4 px-8 bg-gray-800 text-white">
+        <div class="flex items-center justify-between">
+            <!-- Left side logo -->
+            <a href="#" class="flex items-center">
+                <img src="cryptoflow.png" alt="Your Logo" class="h-8">
+                <span class="ml-2 font-bold">Cryptoflow</span>
+            </a>
+
+            <!-- Right side buttons -->
+            <div class="flex items-center space-x-4">
+                <a href="#" class="hover:text-gray-300">Explore</a>
+                <a href="#" class="hover:text-gray-300">Home</a>
+                <a href="#" class="hover:text-gray-300">My Space</a>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        let uploadedImages = {}; // Object to store uploaded images associated with input fields
+        async function connectWallet() {
+            // Check if MetaMask is installed
+            (async () => {
+                if (window.ic && window.ic.plug) {
+                    try {
+                        const publicKey = await window.ic.plug.requestConnect();
+                        alert('Wallet connected successfully!'+ window.ic.plug.accountId);
+                        // Now the wallet is connected, you can proceed with further actions
+                        console.log(`The connected user's public key is:`, publicKey);
+                    } catch (error) {
+                        console.error('Failed to connect wallet:', error);
+                        alert('Failed to connect wallet. Please make sure Plugg Wallet is installed and unlocked.');
+                    }
+                } else {
+                    alert('Plugg Wallet is not detected. Please make sure Plugg Wallet is installed to connect your wallet.');
+                }
+            })();
+
+        }
+        function addInputField() {
+            const inputFieldsDiv = document.getElementById('inputFields');
+            const newInputField = document.createElement('div');
+            newInputField.classList.add('flex', 'items-center', 'mb-4');
+            const placeholder = "Enter something";
+            newInputField.innerHTML = `
+                <input type="text" class="w-full py-2 px-3 border rounded-md focus:outline-none focus:ring focus:border-blue-300 bg-gray-700 text-white" placeholder="${placeholder}">
+                <button onclick="removeInputField(this)" class="ml-2 py-2 px-4 bg-red-500 hover:bg-red-700 text-white rounded-md">-</button>
+            `;
+            inputFieldsDiv.appendChild(newInputField);
+            uploadedImages[placeholder] = []; // Initialize array for storing images associated with this input field
+        }
+
+        function removeInputField(button) {
+            const inputFieldToRemove = button.parentNode;
+            const input = inputFieldToRemove.querySelector('input');
+            const placeholder = input.getAttribute('placeholder');
+            delete uploadedImages[placeholder]; // Remove images associated with this input field from the object
+            inputFieldToRemove.remove();
+        }
+
+        async function connectWallet() {
+            // Check if MetaMask is installed
+            (async () => {
+                if (window.ic && window.ic.plug) {
+                    try {
+                        const publicKey = await window.ic.plug.requestConnect();
+                        alert('Wallet connected successfully!'+ window.ic.plug.accountId);
+                        // Now the wallet is connected, you can proceed with further actions
+                        console.log(`The connected user's public key is:`, publicKey);
+                    } catch (error) {
+                        console.error('Failed to connect wallet:', error);
+                        alert('Failed to connect wallet. Please make sure Plugg Wallet is installed and unlocked.');
+                    }
+                } else {
+                    alert('Plugg Wallet is not detected. Please make sure Plugg Wallet is installed to connect your wallet.');
+                }
+            })();
+
+
+        }
+
+        function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const uploadStatus = document.getElementById('uploadStatus');
+                    if (data.success) {
+                        const imageUrl = data.url;
+                        uploadStatus.innerHTML = `Image uploaded successfully. URL: <a href="${imageUrl}" target="_blank">${imageUrl}</a>`;
+                        const inputFields = document.querySelectorAll('#inputFields input[type="text"]');
+                        inputFields.forEach(inputField => {
+                            const placeholder = inputField.getAttribute('placeholder');
+                            uploadedImages[placeholder].push(imageUrl); // Add uploaded image URL to the array associated with this input field
+                        });
+                    } else {
+                        uploadStatus.textContent = 'Failed to upload image.';
+                        console.error('Error:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const uploadStatus = document.getElementById('uploadStatus');
+                    uploadStatus.textContent = 'Failed to upload image.';
+                });
+        }
+
+        function validateAndProceed() {
+            const inputFields = document.querySelectorAll('#inputFields input[type="text"]');
+            let isEmpty = false;
+
+            inputFields.forEach(inputField => {
+                const placeholder = inputField.getAttribute('placeholder');
+                if (inputField.value.trim() === '' && uploadedImages[placeholder].length === 0) { // Check if both input field and uploaded images are empty
+                    isEmpty = true;
+                }
+            });
+
+            const errorDiv = document.getElementById('error');
+
+            if (isEmpty) {
+                errorDiv.classList.remove('hidden');
+            } else {
+                errorDiv.classList.add('hidden');
+                document.getElementById('nftSelection').classList.remove('hidden');
+                populateCheckboxList(inputFields);
+            }
+        }
+
+        function populateCheckboxList(inputFields) {
+            const inputCheckboxesDiv = document.getElementById('inputCheckboxes');
+            inputCheckboxesDiv.innerHTML = '';
+
+            inputFields.forEach((inputField, index) => {
+                const placeholder = inputField.getAttribute('placeholder');
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.classList.add('flex', 'items-center');
+
+                const checkboxId = `checkbox${index}`;
+                const checkboxLabel = placeholder.trim() !== '' ? placeholder : `Input ${index + 1}`;
+
+                checkboxDiv.innerHTML = `
+                    <input type="checkbox" id="${checkboxId}" class="mr-2" checked>
+                    <label for="${checkboxId}">${checkboxLabel}</label>
+                `;
+
+                inputCheckboxesDiv.appendChild(checkboxDiv);
+            });
+        }
+
+        function toggleSubmitButton() {
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            const submitButton = document.getElementById('submitButton');
+
+            submitButton.disabled = !termsCheckbox.checked;
+        }
+
+        function submitForm() {
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            const termsError = document.getElementById('termsError');
+            const submitButton = document.getElementById('submitButton');
+
+            if (!termsCheckbox.checked) {
+                termsError.classList.remove('hidden');
+                return;
+            }
+
+            // Proceed with form submission...
+            alert('Datasets have been uploaded to marketplace!');
+        }
+    </script>
+</body>
+
+</html>

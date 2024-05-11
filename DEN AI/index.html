@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Upload</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-blue-600 flex items-center justify-center min-h-screen">
+<div class="w-3/4 lg:w-1/2 p-8 rounded-md shadow-md text-center bg-white">
+    <img src="up icon.png" alt="Upload Icon" class="mx-auto mb-4 w-20 h-20">
+    <h2 class="text-lg font-semibold mb-4">Upload Image</h2>
+    <input type="file" id="fileInput" class="mb-4">
+    <button onclick="uploadImage()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">Upload</button>
+    <div id="uploadStatus" class="mt-4 text-gray-700"></div>
+</div>
+
+<script>
+    function uploadImage() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (!file) {
+            alert('Please select a file.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const uploadStatus = document.getElementById('uploadStatus');
+            if (data.success) {
+                const imageUrl = data.url;
+                uploadStatus.innerHTML = `Image uploaded successfully. URL: <a href="${imageUrl}" target="_blank">${imageUrl}</a>`;
+            } else {
+                uploadStatus.textContent = 'Failed to upload image.';
+                console.error('Error:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadStatus.textContent = 'Failed to upload image.';
+        });
+    }
+</script>
+</body>
+</html>
